@@ -68,15 +68,9 @@ public class Shoes {
         this.price = price;
     }
 
-    public String getModelAndBrand(){
-        return "model: " + model + " brand: " + brand;
-    }
-    public String getModelBrandColor(){
-        return "model: " + this.model + " brand: " + this.brand + " color: " + this.color;
-    }
-
-    public String getModelBrandColorSize(){
-        return "model: " + this.model + " brand: " + this.brand + " color: " + this.color + " size: " + this.size;
+    public String getShoesDecription(){
+        return "model: " + this.model + " brand: " + this.brand + " color: " + this.color +
+                " size: " + this.size + " price: " + this.price;
     }
 
 

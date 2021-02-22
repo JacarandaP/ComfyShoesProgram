@@ -20,7 +20,7 @@ public class OrderProgram {
         String inputColor;
         int inputSize;
         int shoesID;
-        int nyOder;
+        int nyOrder;
         Scanner sc = new Scanner(System.in);
 
 
@@ -40,7 +40,7 @@ public class OrderProgram {
                 inputCategory = sc.nextLine().trim();
                 categoryID = r.getCategoryID(inputCategory); //if(categoryID == 0) return;
                 System.out.println("The brands and models available");
-                List <Shoes> s = r.getShoesByCategoryID(categoryID).stream().distinct().collect(Collectors.toList());
+                List <Shoes> s = r.getShoesByCategoryID(categoryID);
                 s.forEach(o -> System.out.println("Model: " + o.getModel() + " Brand: " + o.getBrand() + " Color: " + o.getColor()));
                 System.out.println("Please introduce a brand");
                 inputBrand = sc.nextLine().trim();
@@ -48,13 +48,13 @@ public class OrderProgram {
                 inputModel = sc.nextLine().trim();
                 System.out.println("Please introduce a desired color");
                 inputColor = sc.nextLine().trim();
-                List<Shoes> s2 = r.getShoesColor(categoryID, inputBrand, inputModel, inputColor).stream().collect(Collectors.toList());
+                List<Shoes> s2 = r.getShoesColor(categoryID, inputBrand, inputModel, inputColor);
                 System.out.println("These shoes are available in the following sizes");
                 s2.forEach(b-> System.out.println(b.getSize()));
                 System.out.println("Please choose a size");
                 inputSize = sc.nextInt();
                 shoesID = r.getShoesIDbyBMCS(categoryID, inputBrand, inputModel, inputColor, inputSize).getShoesID();
-                nyOder = r.addToCart(null,clientID, shoesID);
+                nyOrder = r.addToCart(null,clientID, shoesID);
                 //if nyOrder = -1, return
 
                 //TODO: this is another method
@@ -66,22 +66,23 @@ public class OrderProgram {
                 inputCategory = sc2.nextLine().trim();
                 categoryID = r.getCategoryID(inputCategory); //if(categoryID == 0) return;
                 System.out.println("The brands and models available");
-                List <Shoes> test = r.getShoesByCategoryID(categoryID).stream().distinct().collect(Collectors.toList());
-                s.forEach(o -> System.out.println("Model: " + o.getModel() + " Brand: " + o.getBrand() + " Color: " + o.getColor()));
+                List <Shoes> test = r.getShoesByCategoryID(categoryID);
+                test.forEach(o -> System.out.println("Model: " + o.getModel() + " Brand: " + o.getBrand() + " Color: " + o.getColor()));
                 System.out.println("Please introduce a brand");
                 inputBrand = sc2.nextLine().trim();
                 System.out.println("Please introduce a desired model");
                 inputModel = sc2.nextLine().trim();
                 System.out.println("Please introduce a desired color");
                 inputColor = sc2.nextLine().trim();
-                List<Shoes> test2 = r.getShoesColor(categoryID, inputBrand, inputModel, inputColor).stream().collect(Collectors.toList());
+                List<Shoes> test2 = r.getShoesColor(categoryID, inputBrand, inputModel, inputColor);
                 System.out.println("These shoes are available in the following sizes");
-                s2.forEach(b-> System.out.println(b.getSize()));
+                test2.forEach(b-> System.out.println(b.getSize()));
                 System.out.println("Please choose a size");
                 inputSize = sc2.nextInt();
                 shoesID = r.getShoesIDbyBMCS(categoryID, inputBrand, inputModel, inputColor, inputSize).getShoesID();
-                r.addToCart(nyOder,clientID, shoesID);
-
+                r.addToCart(nyOrder,clientID, shoesID);
+                List<Order> finalOrder = r.getOrder(clientID, nyOrder);
+                finalOrder.forEach(o -> o.printOrder());
 
             }
 

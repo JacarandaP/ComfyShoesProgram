@@ -27,7 +27,7 @@ public class Repository {
     }
 
 
-    public int getClientID(String username, String password){
+    public int getClientID(String username, String password) {
         int count = 0;
         ResultSet rs;
         String clientName;
@@ -47,17 +47,17 @@ public class Repository {
             isClientstm.setString(2, password);
             rs = isClientstm.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 count = rs.getInt("count");
             }
 
-            if(count == 1 ){
+            if (count == 1) {
                 getClientstm.setString(1, username);
                 getClientstm.setString(2, password);
                 rs = getClientstm.executeQuery();
 
-                while(rs.next()){
-                    clientID = rs.getInt( "ID");
+                while (rs.next()) {
+                    clientID = rs.getInt("ID");
                     clientName = rs.getString("First_Name");
                     clientLastName = rs.getString("Last_Name");
 
@@ -66,12 +66,10 @@ public class Repository {
                 }
             }
 
-            if( count == 0){
+            if (count == 0) {
                 System.out.println("Client not found. Wrong username or password");
                 return 0;
-            }
-
-            else if(count > 1) {
+            } else if (count > 1) {
                 System.out.println("something went wrong");
                 System.exit(0);
             }
@@ -82,7 +80,7 @@ public class Repository {
         return clientID;
     }
 
-    public List<Category> showCategories(){
+    public List<Category> showCategories() {
         List<Category> categories = new ArrayList<>();
 
         try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
@@ -91,7 +89,7 @@ public class Repository {
              Statement showCategorystm = con.createStatement();
              ResultSet rs = showCategorystm.executeQuery("select * from Category");) {
 
-            while(rs.next()) {
+            while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("description");
                 categories.add(new Category(id, name));
@@ -103,7 +101,7 @@ public class Repository {
         return categories;
     }
 
-    public int getCategoryID(String chosenCat){
+    public int getCategoryID(String chosenCat) {
 
         int count = -1;
         int catID = -1;
@@ -121,11 +119,11 @@ public class Repository {
             isCatstm.setString(1, chosenCat);
             rs = isCatstm.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 count = rs.getInt("count");
             }
 
-            if(count == 1 ) {
+            if (count == 1) {
                 getCatIDstm.setString(1, chosenCat);
                 rs = getCatIDstm.executeQuery();
 
@@ -135,24 +133,22 @@ public class Repository {
 
                 }
             }
-                if( count == 0){
-                    System.out.println("Category not found");
-                    return 0; //TODO check in program
-                }
-
-                else if(count > 1) {
-                    System.out.println("something went wrong");
-                    System.exit(0);
-                }
-
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            if (count == 0) {
+                System.out.println("Category not found");
+                return 0; //TODO check in program
+            } else if (count > 1) {
+                System.out.println("something went wrong");
+                System.exit(0);
             }
-            return catID;
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+        return catID;
+    }
 
 
-    public List<Shoes> getShoesByCategoryID(int catID){
+    public List<Shoes> getShoesByCategoryID(int catID) {
 
         ResultSet rs;
         List<Shoes> shoesByCat = new ArrayList<>();
@@ -163,23 +159,23 @@ public class Repository {
                 p.getProperty("password"));
              PreparedStatement getShoesbyCatstm = con.prepareStatement(getShoesbyCat);) {
 
-                getShoesbyCatstm.setInt(1, catID);
-                rs = getShoesbyCatstm.executeQuery();
+            getShoesbyCatstm.setInt(1, catID);
+            rs = getShoesbyCatstm.executeQuery();
 
-                    while(rs.next()) {
+            while (rs.next()) {
 
-                        int shoesID = rs.getInt("ID");
-                        String brand = rs.getString("Brand");
-                        int size = rs.getInt("Size");
-                        String color = rs.getString("Color");
-                        String model = rs.getString("Model");
-                        double price = rs.getDouble("Price");
-                        shoesByCat.add(new Shoes(shoesID, brand, size, color, model, price));
+                int shoesID = rs.getInt("ID");
+                String brand = rs.getString("Brand");
+                int size = rs.getInt("Size");
+                String color = rs.getString("Color");
+                String model = rs.getString("Model");
+                double price = rs.getDouble("Price");
+                shoesByCat.add(new Shoes(shoesID, brand, size, color, model, price));
 
 
-                    }
+            }
 
-            if( shoesByCat.size() == 0){
+            if (shoesByCat.size() == 0) {
                 System.out.println("Sorry, we don't have shoes of this category right now"); //TODO: maybe this goes infront?
             }
 
@@ -192,141 +188,175 @@ public class Repository {
         return shoesByCat;
     }
 
-  public List <Shoes> getShoesColor(int catID, String inputBrand, String inputModel, String inputColor) {
+    public List<Shoes> getShoesColor(int catID, String inputBrand, String inputModel, String inputColor) {
 
-      ResultSet rs;
-      List<Shoes> shoesbyBrandM = new ArrayList<>();
-      String getShoesByBrandandM = "Select * from shoes inner join shoes_categorydetails" +
-              " on shoes_categorydetails.shoesID = shoes.ID" +
-              " where shoes.brand = ? and shoes.model = ? and shoes.color = ?" +
-              " and shoes_categorydetails.CategoryID = ?";
+        ResultSet rs;
+        List<Shoes> shoesbyBrandM = new ArrayList<>();
+        String getShoesByBrandandM = "Select * from shoes inner join shoes_categorydetails" +
+                " on shoes_categorydetails.shoesID = shoes.ID" +
+                " where shoes.brand = ? and shoes.model = ? and shoes.color = ?" +
+                " and shoes_categorydetails.CategoryID = ?";
 
-      try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
-              p.getProperty("name"),
-              p.getProperty("password"));
-           PreparedStatement getShoesbyBrandAndMsmt = con.prepareStatement(getShoesByBrandandM);) {
+        try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
+                p.getProperty("name"),
+                p.getProperty("password"));
+             PreparedStatement getShoesbyBrandAndMsmt = con.prepareStatement(getShoesByBrandandM);) {
 
-          getShoesbyBrandAndMsmt.setString(1,inputBrand);
-          getShoesbyBrandAndMsmt.setString(2, inputModel);
-          getShoesbyBrandAndMsmt.setString(3, inputColor);
-          getShoesbyBrandAndMsmt.setInt(4, catID);
+            getShoesbyBrandAndMsmt.setString(1, inputBrand);
+            getShoesbyBrandAndMsmt.setString(2, inputModel);
+            getShoesbyBrandAndMsmt.setString(3, inputColor);
+            getShoesbyBrandAndMsmt.setInt(4, catID);
 
-          rs = getShoesbyBrandAndMsmt.executeQuery();
+            rs = getShoesbyBrandAndMsmt.executeQuery();
 
-          while(rs.next()){
-              int shoesID = rs.getInt("ID");
-              String brand = rs.getString("Brand");
-              int size = rs.getInt("Size");
-              String color = rs.getString("Color");
-              String model = rs.getString("Model");
-              double price = rs.getDouble("Price");
-              shoesbyBrandM.add(new Shoes(shoesID, brand, size, color, model, price));
+            while (rs.next()) {
+                int shoesID = rs.getInt("ID");
+                String brand = rs.getString("Brand");
+                int size = rs.getInt("Size");
+                String color = rs.getString("Color");
+                String model = rs.getString("Model");
+                double price = rs.getDouble("Price");
+                shoesbyBrandM.add(new Shoes(shoesID, brand, size, color, model, price));
 
-          }
+            }
 
-          if(shoesbyBrandM.size() == 0){
-              System.out.println("Sorry, we don't have shoes with that description right now");
-          }
+            if (shoesbyBrandM.size() == 0) {
+                System.out.println("Sorry, we don't have shoes with that description right now");
+            }
 
-      } catch (SQLException e) {
-          e.printStackTrace();
-          System.out.println("something went wrong");
-          System.exit(0);
-      }
-      return shoesbyBrandM;
-  }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("something went wrong");
+            System.exit(0);
+        }
+        return shoesbyBrandM;
+    }
 
-  public Shoes getShoesIDbyBMCS(int catID, String inputBrand, String inputModel, String inputColor, int inputSize){
-      ResultSet rs;
-      Shoes selectedShoes = null;
-      String getShoesIDbyBMCS = "Select * from shoes inner join shoes_categorydetails" +
-              " on shoes_categorydetails.shoesID = shoes.ID" +
-              " where shoes.brand = ? and shoes.model = ? and shoes.color = ?" +
-              " and shoes_categorydetails.CategoryID = ?" +
-              " and shoes.size = ?";
+    public Shoes getShoesIDbyBMCS(int catID, String inputBrand, String inputModel, String inputColor, int inputSize) {
+        ResultSet rs;
+        Shoes selectedShoes = null;
+        String getShoesIDbyBMCS = "Select * from shoes inner join shoes_categorydetails" +
+                " on shoes_categorydetails.shoesID = shoes.ID" +
+                " where shoes.brand = ? and shoes.model = ? and shoes.color = ?" +
+                " and shoes_categorydetails.CategoryID = ?" +
+                " and shoes.size = ?";
 
-      try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
-              p.getProperty("name"),
-              p.getProperty("password"));
-           PreparedStatement getShoesIDbyBMCSstm = con.prepareStatement(getShoesIDbyBMCS);) {
+        try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
+                p.getProperty("name"),
+                p.getProperty("password"));
+             PreparedStatement getShoesIDbyBMCSstm = con.prepareStatement(getShoesIDbyBMCS);) {
 
-          getShoesIDbyBMCSstm.setString(1,inputBrand);
-          getShoesIDbyBMCSstm.setString(2, inputModel);
-          getShoesIDbyBMCSstm.setString(3, inputColor);
-          getShoesIDbyBMCSstm.setInt(4, catID);
-          getShoesIDbyBMCSstm.setInt(5, inputSize);
+            getShoesIDbyBMCSstm.setString(1, inputBrand);
+            getShoesIDbyBMCSstm.setString(2, inputModel);
+            getShoesIDbyBMCSstm.setString(3, inputColor);
+            getShoesIDbyBMCSstm.setInt(4, catID);
+            getShoesIDbyBMCSstm.setInt(5, inputSize);
 
-          rs = getShoesIDbyBMCSstm.executeQuery();
+            rs = getShoesIDbyBMCSstm.executeQuery();
 
-          while(rs.next()){
-              int shoesID = rs.getInt("ID");
-              String brand = rs.getString("Brand");
-              int size = rs.getInt("Size");
-              String color = rs.getString("Color");
-              String model = rs.getString("Model");
-              double price = rs.getDouble("Price");
-              selectedShoes = new Shoes(shoesID, brand, size, color, model, price);
+            while (rs.next()) {
+                int shoesID = rs.getInt("ID");
+                String brand = rs.getString("Brand");
+                int size = rs.getInt("Size");
+                String color = rs.getString("Color");
+                String model = rs.getString("Model");
+                double price = rs.getDouble("Price");
+                selectedShoes = new Shoes(shoesID, brand, size, color, model, price);
 
-          }
+            }
 
-          if(selectedShoes == null){
-              System.out.println("Sorry, we don't have shoes with that description right now");
-          }
+            if (selectedShoes == null) {
+                System.out.println("Sorry, we don't have shoes with that description right now");
+            }
 
-      } catch (SQLException e) {
-          e.printStackTrace();
-          System.out.println("something went wrong");
-          System.exit(0);
-      }
-      return selectedShoes;
-  }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("something went wrong");
+            System.exit(0);
+        }
+        return selectedShoes;
+    }
 
 
-
-  public int addToCart(Integer order, int clientID, int shoesID){
+    public int addToCart(Integer order, int clientID, int shoesID) {
         int nyOrderID = -1;
         String sp = "Call AddToCart(?, ? , ?, ?)";
 
-      try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
-              p.getProperty("name"),
-              p.getProperty("password"));
-           CallableStatement cstmt = con.prepareCall(sp);
-           CallableStatement cstmt2 = con.prepareCall(sp);) {
+        try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
+                p.getProperty("name"),
+                p.getProperty("password"));
+             CallableStatement cstmt = con.prepareCall(sp);
+             CallableStatement cstmt2 = con.prepareCall(sp);) {
 
-          if(order == null) {
+            if (order == null) {
 
-              cstmt.setString(1, null);
-              cstmt.setInt(2, clientID);
-              cstmt.setInt(3, shoesID);
-              cstmt.registerOutParameter(4, Types.INTEGER);
-              cstmt.execute();
-              nyOrderID = cstmt.getInt(4);
+                cstmt.setString(1, null);
+                cstmt.setInt(2, clientID);
+                cstmt.setInt(3, shoesID);
+                cstmt.registerOutParameter(4, Types.INTEGER);
+                cstmt.execute();
+                nyOrderID = cstmt.getInt(4);
 
-          }
+            } else {
 
-          else {
+                cstmt.setInt(1, order);
+                cstmt.setInt(2, clientID);
+                cstmt.setInt(3, shoesID);
+                cstmt.execute();
 
-              cstmt.setInt(1, order);
-              cstmt.setInt(2, clientID);
-              cstmt.setInt(3, shoesID);
-              cstmt.execute();
+            }
 
-          }
-
-      } catch (SQLException e){
-          System.out.println(e.getMessage() +"("+e.getErrorCode()+")");
-          //TODO CONTINUE SHOPPING
+        } catch (SQLException e) {
+            System.out.println(e.getMessage() + "(" + e.getErrorCode() + ")");
+            //TODO CONTINUE SHOPPING
 
 
-      } catch (Exception e) {
-          e.printStackTrace();
-          System.out.println("something went wrong");
-          System.exit(0);
-      }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("something went wrong");
+            System.exit(0);
+        }
 
-      System.out.println("product added to your order");
-      return nyOrderID;
-  }
+        System.out.println("product added to your order");
+        return nyOrderID;
+    }
 
+    public List<Order> getOrder(int inputClientID, int inputOrderID) {
+        List<Order> clientOrder = new ArrayList<>();
+        List<Shoes> shoesInOrder = new ArrayList<>();
+        ResultSet rs;
+        String getClientOrder = "Select shoes.id, shoes.brand, shoes.model, shoes.color, shoes.size, shoes.price" +
+                " from shoes" +
+                " inner join order_details on Shoes.ID = order_details.shoesid inner join order_" +
+                " on order_.ID = order_details.OrderID where order_.id = ? and order_.ClientID = ?";
 
+        try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
+                p.getProperty("name"),
+                p.getProperty("password"));
+             PreparedStatement getOrderstm = con.prepareStatement(getClientOrder);) {
+
+            getOrderstm.setInt(1, inputOrderID);
+            getOrderstm.setInt(2, inputClientID);
+
+            rs = getOrderstm.executeQuery();
+
+            while (rs.next()) {
+                int shoesID = rs.getInt("ID");
+                String brand = rs.getString("Brand");
+                int size = rs.getInt("Size");
+                String color = rs.getString("Color");
+                String model = rs.getString("Model");
+                double price = rs.getDouble("Price");
+                shoesInOrder.add(new Shoes(shoesID, brand, size, color, model, price));
+                int orderId = rs.getInt("ID");
+                clientOrder.add(new Order(orderId, shoesInOrder));
+
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    return clientOrder;
+    }
 }
