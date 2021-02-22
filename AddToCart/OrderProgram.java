@@ -35,6 +35,7 @@ public class OrderProgram {
                     }
                    //TODO: make a method of this.
                 System.out.println("Which category of shoes would you like to check?");
+                    //TODO, ja eller nej
                 System.out.println(r.showCategories().stream().map(Category::getDescription).collect(Collectors.toList()));
                 inputCategory = sc.nextLine().trim();
                 categoryID = r.getCategoryID(inputCategory); //if(categoryID == 0) return;
@@ -54,7 +55,7 @@ public class OrderProgram {
                 inputSize = sc.nextInt();
                 shoesID = r.getShoesIDbyBMCS(categoryID, inputBrand, inputModel, inputColor, inputSize).getShoesID();
                 nyOder = r.addToCart(null,clientID, shoesID);
-                //System.out.println(nyOder + "");
+                //if nyOrder = -1, return
 
                 //TODO: this is another method
                 System.out.println("Would you like to keep shoping");
