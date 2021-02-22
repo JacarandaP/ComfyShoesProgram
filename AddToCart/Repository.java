@@ -105,8 +105,8 @@ public class Repository {
 
     public int getCategoryID(String chosenCat){
 
-        int count = 0;
-        int catID = 0;
+        int count = -1;
+        int catID = -1;
         ResultSet rs;
         List<Shoes> shoesByCat = new ArrayList<>();
 
@@ -283,9 +283,9 @@ public class Repository {
 
 
 
-  public int addToCart(int clientID, int shoesID){
+  public int addToCart(Integer order, int clientID, int shoesID){
         int nyOrderID = -1;
-        String sp = "Call AddToCart(?, ? , ?)";
+        String sp = "Call AddToCart(?, ? , ?, ?)";
 
       try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
               p.getProperty("name"),
@@ -293,17 +293,25 @@ public class Repository {
            CallableStatement cstmt = con.prepareCall(sp);
            CallableStatement cstmt2 = con.prepareCall(sp);) {
 
-          cstmt.setString(1, null);
-          cstmt.setInt(2, clientID);
-          cstmt.setInt(3,shoesID);
-          cstmt.registerOutParameter(4, Types.INTEGER);
-          cstmt.execute();
-          int oderID = cstmt.getInt(4);
+          if(order == null) {
 
-          cstmt.setString(1, oderID+"");
-          cstmt.setInt(2, clientID);
-          cstmt.setInt(3,shoesID);
-          cstmt.execute();
+              cstmt.setString(1, null);
+              cstmt.setInt(2, clientID);
+              cstmt.setInt(3, shoesID);
+              cstmt.registerOutParameter(4, Types.INTEGER);
+              cstmt.execute();
+              nyOrderID = cstmt.getInt(4);
+
+          }
+
+          else {
+
+              cstmt.setInt(1, order);
+              cstmt.setInt(2, clientID);
+              cstmt.setInt(3, shoesID);
+              cstmt.execute();
+
+          }
 
       } catch (SQLException e){
           System.out.println(e.getMessage() +"("+e.getErrorCode()+")");
@@ -312,6 +320,7 @@ public class Repository {
       } catch (Exception e) {
           e.printStackTrace();
           System.out.println("something went wrong");
+          System.exit(0);
       }
 
       System.out.println("product added to your order");
