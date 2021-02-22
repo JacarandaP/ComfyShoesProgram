@@ -1,6 +1,10 @@
 package AddToCart;
 
 
+import Objects.Category;
+import Objects.Order;
+import Objects.Shoes;
+
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -36,12 +40,15 @@ public class OrderProgram {
                    //TODO: make a method of this.
                 System.out.println("Which category of shoes would you like to check?");
                     //TODO, ja eller nej
-                System.out.println(r.showCategories().stream().map(Category::getDescription).collect(Collectors.toList()));
+
+                List<Category> categoryList = r.showCategories();
+                categoryList.forEach(c -> c.getDescription());
+                //System.out.println(r.showCategories().stream().map(Category::getDescription).collect(Collectors.toList()));
                 inputCategory = sc.nextLine().trim();
                 categoryID = r.getCategoryID(inputCategory); //if(categoryID == 0) return;
                 System.out.println("The brands and models available");
-                List <Shoes> s = r.getShoesByCategoryID(categoryID);
-                s.forEach(o -> System.out.println("Model: " + o.getModel() + " Brand: " + o.getBrand() + " Color: " + o.getColor()));
+                List <Shoes> shoesbyCat = r.getShoesByCategoryID(categoryID);
+                shoesbyCat.forEach(o -> System.out.println("Model: " + o.getModel() + " Brand: " + o.getBrand() + " Color: " + o.getColor()));
                 System.out.println("Please introduce a brand");
                 inputBrand = sc.nextLine().trim();
                 System.out.println("Please introduce a desired model");
@@ -82,7 +89,7 @@ public class OrderProgram {
                 shoesID = r.getShoesIDbyBMCS(categoryID, inputBrand, inputModel, inputColor, inputSize).getShoesID();
                 r.addToCart(nyOrder,clientID, shoesID);
                 List<Order> finalOrder = r.getOrder(clientID, nyOrder);
-                finalOrder.forEach(o -> o.printOrder());
+                finalOrder.forEach(o -> o.printOrderSimple());
 
             }
 

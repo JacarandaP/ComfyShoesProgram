@@ -1,6 +1,7 @@
-package AddToCart;
+package Objects;
 
 
+import java.util.List;
 
 public class Shoes {
     private int shoesID;
@@ -9,14 +10,17 @@ public class Shoes {
     private String color;
     private String model;
     private double price;
+    private int stock;
 
-    public Shoes(int shoesID, String brand, int size, String color, String model, double price) {
+
+    public Shoes(int shoesID, String brand, int size, String color, String model, double price, int stock) {
         this.shoesID = shoesID;
         this.brand = brand;
         this.size = size;
         this.color = color;
         this.model = model;
         this.price = price;
+        this.stock = stock;
 
     }
 
@@ -68,9 +72,17 @@ public class Shoes {
         this.price = price;
     }
 
-    public String getShoesDecription(){
-        return "model: " + this.model + " brand: " + this.brand + " color: " + this.color +
-                " size: " + this.size + " price: " + this.price;
+    public int getStock(int stock){
+        return stock;
+    }
+
+    public void setStock(int stock){
+        this.stock = stock;
+    }
+
+    public void getShoesDecription(){
+        System.out.println("model: " + this.model + " brand: " + this.brand + " color: " + this.color +
+                " size: " + this.size + " price: " + this.price);
     }
 
 

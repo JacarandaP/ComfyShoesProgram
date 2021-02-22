@@ -1,6 +1,11 @@
 package AddToCart;
 
 
+import Objects.Category;
+import Objects.Order;
+import Objects.Review;
+import Objects.Shoes;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -81,6 +86,7 @@ public class Repository {
     }
 
     public List<Category> showCategories() {
+
         List<Category> categories = new ArrayList<>();
 
         try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
@@ -90,10 +96,9 @@ public class Repository {
              ResultSet rs = showCategorystm.executeQuery("select * from Category");) {
 
             while (rs.next()) {
-                int id = rs.getInt("id");
+                int categoryID = rs.getInt("id");
                 String name = rs.getString("description");
-                categories.add(new Category(id, name));
-
+                categories.add(new Category(categoryID, name, null));
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -153,7 +158,8 @@ public class Repository {
         ResultSet rs;
         List<Shoes> shoesByCat = new ArrayList<>();
 
-        String getShoesbyCat = "SELECT * FROM shoes, shoes_categorydetails WHERE shoes_categorydetails.ShoesID = shoes.id AND shoes_categorydetails.CategoryID = ?";
+        String getShoesbyCat = "SELECT * FROM shoes, shoes_categorydetails WHERE shoes_categorydetails.ShoesID = shoes.id " +
+                "AND shoes_categorydetails.CategoryID = ?";
         try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
                 p.getProperty("name"),
                 p.getProperty("password"));
@@ -170,7 +176,8 @@ public class Repository {
                 String color = rs.getString("Color");
                 String model = rs.getString("Model");
                 double price = rs.getDouble("Price");
-                shoesByCat.add(new Shoes(shoesID, brand, size, color, model, price));
+                int inStock = rs.getInt("In_Stock");
+                shoesByCat.add(new Shoes(shoesID, brand, size, color, model, price, inStock));
 
 
             }
@@ -216,7 +223,8 @@ public class Repository {
                 String color = rs.getString("Color");
                 String model = rs.getString("Model");
                 double price = rs.getDouble("Price");
-                shoesbyBrandM.add(new Shoes(shoesID, brand, size, color, model, price));
+                int inStock = rs.getInt("In_Stock");
+                shoesbyBrandM.add(new Shoes(shoesID, brand, size, color, model, price, inStock));
 
             }
 
@@ -261,7 +269,8 @@ public class Repository {
                 String color = rs.getString("Color");
                 String model = rs.getString("Model");
                 double price = rs.getDouble("Price");
-                selectedShoes = new Shoes(shoesID, brand, size, color, model, price);
+                int inStock = rs.getInt("In_Stock");
+                selectedShoes = new Shoes(shoesID, brand, size, color, model, price, inStock);
 
             }
 
@@ -285,8 +294,7 @@ public class Repository {
         try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
                 p.getProperty("name"),
                 p.getProperty("password"));
-             CallableStatement cstmt = con.prepareCall(sp);
-             CallableStatement cstmt2 = con.prepareCall(sp);) {
+             CallableStatement cstmt = con.prepareCall(sp);){
 
             if (order == null) {
 
@@ -308,7 +316,7 @@ public class Repository {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage() + "(" + e.getErrorCode() + ")");
-            //TODO CONTINUE SHOPPING
+            //TODO CONTINUE SHOPPING. STOP LOOP
 
 
         } catch (Exception e) {
@@ -326,7 +334,7 @@ public class Repository {
         List<Shoes> shoesInOrder = new ArrayList<>();
         ResultSet rs;
         String getClientOrder = "Select shoes.id, shoes.brand, shoes.model, shoes.color, shoes.size, shoes.price" +
-                " from shoes" +
+                " shoes.in_stock, order_.date from shoes" +
                 " inner join order_details on Shoes.ID = order_details.shoesid inner join order_" +
                 " on order_.ID = order_details.OrderID where order_.id = ? and order_.ClientID = ?";
 
@@ -347,9 +355,10 @@ public class Repository {
                 String color = rs.getString("Color");
                 String model = rs.getString("Model");
                 double price = rs.getDouble("Price");
-                shoesInOrder.add(new Shoes(shoesID, brand, size, color, model, price));
-                int orderId = rs.getInt("ID");
-                clientOrder.add(new Order(orderId, shoesInOrder));
+                Date orderDate = rs.getDate("Date");
+                int inStock = rs.getInt("In_stock");
+                shoesInOrder.add(new Shoes(shoesID, brand, size, color, model, price, inStock));
+                clientOrder.add(new Order(inputOrderID, shoesInOrder, orderDate));
 
             }
 
@@ -359,4 +368,70 @@ public class Repository {
 
     return clientOrder;
     }
+
+    public String rate(int inputClientID, int inputShoesID, int inputRate, String inputComment){
+        String makeReview = "Call Rate(?,?,?,?)";
+
+
+        try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
+                p.getProperty("name"),
+                p.getProperty("password"));
+             CallableStatement makeReviewstm = con.prepareCall(makeReview);) {
+
+            makeReviewstm.setInt(1, inputClientID);
+            makeReviewstm.setInt(2, inputShoesID);
+            makeReviewstm.setInt(3, inputRate);
+            makeReviewstm.setString(4, inputComment);
+            makeReviewstm.executeQuery();
+
+        } catch (SQLException e) {
+            return e.getMessage() + "(" + e.getErrorCode() + ")";
+
+    }
+        return "your review has been added";
+    }
+
+    public List<String> getReview(int shoesID){
+        List<String> reviewList = new ArrayList<>();
+        String getReview = "Select comment from review_definition, review where review_definition.id = review.reviewid" +
+                " and review.shoesid = ?";
+        String getAvg = "{? = Call getReview(?)}";
+        double avgRate;
+        ResultSet rs;
+
+        try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
+                p.getProperty("name"),
+                p.getProperty("password"));
+             CallableStatement getAveragestm = con.prepareCall(getAvg);
+             PreparedStatement getReviewstm = con.prepareStatement(getReview);) {
+
+
+            getAveragestm.registerOutParameter(1,Types.DOUBLE);
+            getAveragestm.setInt(2, shoesID);
+            getAveragestm.execute();
+            avgRate = getAveragestm.getDouble(1);
+            System.out.println("Average rating for this product is " + avgRate);
+
+            getReviewstm.setInt(1, shoesID);
+            rs = getReviewstm.executeQuery();
+
+            while (rs.next()) {
+                String review = rs.getString("comment");
+                    if (review != null){
+                        reviewList.add(review);
+                    }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return reviewList;
+    }
+
+
+    public void fillCategory(){
+        List<Category> categoryList = showCategories();
+        categoryList.forEach(c -> c.setShoesListBelongingCat(getShoesByCategoryID(c.getId())));
+    }
+
+
 }
