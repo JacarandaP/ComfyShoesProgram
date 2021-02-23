@@ -1,6 +1,7 @@
 package Objects;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Category {
 
@@ -14,7 +15,11 @@ public class Category {
          this.shoesListBelongingCat = shoesListBelongingCat;
      }
 
-     public int getId() {
+    public Category() {
+
+    }
+
+    public int getId() {
          return id;
      }
 
@@ -36,5 +41,12 @@ public class Category {
 
     public void setDescription(String description) {
          this.description = description;
+     }
+
+     public void printCategory(){
+         System.out.println("id: "+ id +  description );
+         System.out.println("Shoes in this category: " +  shoesListBelongingCat.stream()
+         .map(Shoes::getShoesModelAndBrand)
+         .collect(Collectors.toList()));
      }
  }

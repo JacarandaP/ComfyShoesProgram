@@ -24,6 +24,10 @@ public class Shoes {
 
     }
 
+    public Shoes() {
+
+    }
+
     public int getShoesID() {
         return shoesID;
     }
@@ -80,11 +84,17 @@ public class Shoes {
         this.stock = stock;
     }
 
-    public void getShoesDecription(){
+    public void printShoes(){
         System.out.println("model: " + this.model + " brand: " + this.brand + " color: " + this.color +
                 " size: " + this.size + " price: " + this.price);
     }
 
-
+    public String getShoesModelAndBrand(){
+        return "model: " + this.model + " brand: " + this.brand;
+    }
+    public String printShoes2(){
+        return "model: " + this.model + " brand: " + this.brand + " color: " + this.color +
+                " size: " + this.size + " price: " + this.price;
+    }
 
 }

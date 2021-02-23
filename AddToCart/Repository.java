@@ -16,7 +16,7 @@ import java.util.Properties;
 
 public class Repository {
     private Properties p = new Properties();
-    private Connection con;
+    //private Connection con;
 
     public Repository() {
         try {
@@ -432,6 +432,8 @@ public class Repository {
         List<Category> categoryList = showCategories();
         categoryList.forEach(c -> c.setShoesListBelongingCat(getShoesByCategoryID(c.getId())));
     }
+
+
 
 
 }
