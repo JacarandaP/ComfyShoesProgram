@@ -30,8 +30,6 @@ public class Menu {
     }
 
 
-
-
     public void showOptionsAfterShop(int clientID, int shoesID, int orderID){
         int temp = -1;
         while (temp != 0) {
@@ -93,32 +91,30 @@ public class Menu {
 
     public void menu() {
         categoryID = c.getCategory();
-
-        if (categoryID == 0) {
+            if (categoryID == 0) {
             menu();
-        }
+            }
 
         List<Shoes> firstSelectionShoesList = c.getShoesListByCategory(categoryID);
-
-        if (firstSelectionShoesList.size() == 0) {
+            if (firstSelectionShoesList.size() == 0) {
             menu();
-        }
+            }
 
         List<Shoes> secondSelectionShoesList = c.getShoesListByBMC(firstSelectionShoesList, categoryID);
-
-        if (secondSelectionShoesList.size() == 0) {
+            if (secondSelectionShoesList.size() == 0) {
             menu();
-        }
+            }
 
         shoesID = c.getShoesFinalSelection(secondSelectionShoesList, categoryID);
-        if (shoesID == 0) {
+            if (shoesID == 0) {
             menu();
-        }
+            }
 
-        if (order == null) {
+            if (order == null) {
             order = r.addToCart(null, clientID, shoesID);
             showOptionsAfterShop(clientID, shoesID, order);
-        } else {
+
+            } else {
             nyOrder = r.addToCart(order, clientID, shoesID);
             showOptionsAfterShop(clientID, shoesID, nyOrder);
         }
