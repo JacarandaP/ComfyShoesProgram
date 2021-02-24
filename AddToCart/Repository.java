@@ -422,15 +422,16 @@ public class Repository {
             }
             else {
                 System.out.println("Average rating for this product is " + avgRate);
-            }
-            getReviewstm.setInt(1, shoesID);
-            rs = getReviewstm.executeQuery();
 
-            while (rs.next()) {
-                String review = rs.getString("comment");
-                    if (review != null){
+                getReviewstm.setInt(1, shoesID);
+                rs = getReviewstm.executeQuery();
+
+                while (rs.next()) {
+                    String review = rs.getString("comment");
+                    if (review != null) {
                         reviewList.add(review);
                     }
+                }
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
