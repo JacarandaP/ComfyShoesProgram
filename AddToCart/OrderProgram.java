@@ -6,6 +6,7 @@ import Objects.Order;
 import Objects.Shoes;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ public class OrderProgram {
 
         int shoesID;
         int nyOrder;
-        Scanner sc = new Scanner(System.in);
+
 
 
         while (true) {
@@ -50,43 +51,26 @@ public class OrderProgram {
                 getShoesListByBMC(firstSelectionShoesList, categoryID);
             }
 
-            shoesID = getShoesFinalSelection(firstSelectionShoesList, categoryID);
+            shoesID = getShoesFinalSelection(secondSelectionShoesList, categoryID);
                 if (shoesID == 0){
-                    getShoesFinalSelection(firstSelectionShoesList, categoryID);
+                    getShoesFinalSelection(secondSelectionShoesList, categoryID);
                 }
 
                 nyOrder = r.addToCart(null, clientID, shoesID);
-                //if nyOrder = -1, return
+               if (nyOrder == 0){
+                   getCategory();
+               }
 
-                //TODO: this is another method
-                System.out.println("Would you like to keep shoping");
-                System.out.println("Which category of shoes would you like to check?");
-                System.out.println(r.showCategories().stream().map(Category::getDescription).collect(Collectors.toList()));
-                Scanner sc2 = new Scanner(System.in);
+               showOptionsAfterShop(clientID, shoesID, nyOrder);
 
-                inputCategory = sc2.nextLine().trim();
-                categoryID = r.getCategoryID(inputCategory); //if(categoryID == 0) return;
-                System.out.println("The brands and models available");
-                List<Shoes> test = r.getShoesByCategoryID(categoryID);
-                test.forEach(o -> System.out.println("Model: " + o.getModel() + " Brand: " + o.getBrand() + " Color: " + o.getColor()));
-                System.out.println("Please introduce a brand");
-                inputBrand = sc2.nextLine().trim();
-                System.out.println("Please introduce a desired model");
-                inputModel = sc2.nextLine().trim();
-                System.out.println("Please introduce a desired color");
-                inputColor = sc2.nextLine().trim();
-                List<Shoes> test2 = r.getShoesColor(categoryID, inputBrand, inputModel, inputColor);
-                System.out.println("These shoes are available in the following sizes");
-                test2.forEach(b -> System.out.println(b.getSize()));
-                System.out.println("Please choose a size");
-                inputSize = sc2.nextInt();
-                shoesID = r.getShoesIDbyBMCS(categoryID, inputBrand, inputModel, inputColor, inputSize).getShoesID();
-                r.addToCart(nyOrder, clientID, shoesID);
-                List<Order> finalOrder = r.getOrder(clientID, nyOrder);
-                finalOrder.forEach(o -> o.printOrderSimple());
+
+/*
+
+
+
 
             }
-
+*/}
 
         }
 
@@ -143,6 +127,7 @@ public class OrderProgram {
         inputColor = sc.nextLine().trim();
         shoesList = r.getShoesColor(categoryID, inputBrand, inputModel, inputColor);
 
+
         return shoesList;
 
     }
@@ -165,6 +150,61 @@ public class OrderProgram {
         return shoesID;
 
     }
+
+    public void showFirstMenu(){
+
+    }
+
+    public void showOptionsAfterShop(int clientID, int shoesID, int orderID){
+        int temp = -1;
+        while (temp != 0) {
+            System.out.println("Would you like to do now?");
+            System.out.println("1: Review this product");
+            System.out.println("2: Keep shopping");
+            System.out.println("3: See your order");
+            System.out.println("4: Log out");
+            temp = getInfoFromUser();
+            switch (temp){
+                case 1:
+                    System.out.println("Rate this product from 1 to 4 \t1: Bad \t2: Okej \t3:Good \t 4:Very Good");
+                    Scanner sc = new Scanner(System.in);
+                    int inputRate = getInfoFromUser();
+                    System.out.println("Write your review (max 350 letters)");
+                    String review =sc.nextLine();
+                    System.out.println(r.rate(clientID, shoesID, inputRate, review)+"");
+                    break;
+
+                case 2:
+                    return;
+
+                case 3:
+                    List<Order> finalOrder = r.getOrder(clientID, orderID);
+                    finalOrder.forEach(o -> o.printOrder());
+                    break;
+                case 4:
+                    System.out.println("Thank you! You are being logged out");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid option");
+                    break;
+            }
+        }
+    }
+
+    public int getInfoFromUser(){
+        int input = -2;
+        while (input == -2) {
+            try {
+                Scanner s = new Scanner(System.in);
+                input = s.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Just numbers allowed. Please try again \n");
+            }
+        }
+        return input;
+    }
+
 
     public static void main(String[] args) throws InterruptedException {
         OrderProgram oP = new OrderProgram();

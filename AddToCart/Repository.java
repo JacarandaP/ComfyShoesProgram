@@ -54,29 +54,29 @@ public class Repository {
 
             while (rs.next()) {
                 count = rs.getInt("count");
-            }
 
-            if (count == 1) {
-                getClientstm.setString(1, username);
-                getClientstm.setString(2, password);
-                rs = getClientstm.executeQuery();
+                if (count == 1) {
+                    getClientstm.setString(1, username);
+                    getClientstm.setString(2, password);
+                    rs = getClientstm.executeQuery();
 
-                while (rs.next()) {
-                    clientID = rs.getInt("ID");
-                    clientName = rs.getString("First_Name");
-                    clientLastName = rs.getString("Last_Name");
+                    while (rs.next()) {
+                        clientID = rs.getInt("ID");
+                        clientName = rs.getString("First_Name");
+                        clientLastName = rs.getString("Last_Name");
 
-                    System.out.println("Welcome back " + clientName + " " + clientLastName);
-
+                        System.out.println("Welcome back " + clientName + " " + clientLastName);
+                        return clientID;
+                    }
                 }
-            }
 
-            if (count == 0) {
-                System.out.println("Client not found. Wrong username or password");
-                return 0;
-            } else if (count > 1) {
-                System.out.println("Something went wrong");
-                return 0;
+                if (count == 0) {
+                    System.out.println("Client not found. Wrong username or password");
+                    return clientID = 0;
+                } else if (count > 1) {
+                    System.out.println("Something went wrong");
+                    return clientID = 0;
+                }
             }
 
         } catch (SQLException throwables) {
@@ -131,24 +131,25 @@ public class Repository {
 
             while (rs.next()) {
                 count = rs.getInt("count");
-            }
 
-            if (count == 1) {
-                getCatIDstm.setString(1, chosenCat);
-                rs = getCatIDstm.executeQuery();
 
-                while (rs.next()) {
+                if (count == 1) {
+                    getCatIDstm.setString(1, chosenCat);
+                    rs = getCatIDstm.executeQuery();
 
-                    catID = rs.getInt("ID");
+                    while (rs.next()) {
 
+                        catID = rs.getInt("ID");
+
+                    }
                 }
-            }
-            if (count == 0) {
-                System.out.println("Category not found");
-                return 0;
-            } else if (count > 1) {
-                System.out.println("Something went wrong");
-                return 0;
+                if (count == 0) {
+                    System.out.println("Category not found");
+                    return 0;
+                } else if (count > 1) {
+                    System.out.println("Something went wrong");
+                    return 0;
+                }
             }
 
         } catch (SQLException throwables) {
@@ -282,7 +283,6 @@ public class Repository {
                 int inStock = rs.getInt("In_Stock");
                 selectedShoes = new Shoes(shoesID, brand, size, color, model, price, inStock);
                 selectedShoesID = selectedShoes.getShoesID();
-
             }
 
             if (selectedShoes == null) {
@@ -323,7 +323,7 @@ public class Repository {
                 cstmt.setInt(2, clientID);
                 cstmt.setInt(3, shoesID);
                 cstmt.execute();
-                cstmt.registerOutParameter(4, );
+                return order;
 
             }
 
@@ -334,7 +334,7 @@ public class Repository {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("something went wrong");
+            System.out.println("Something went wrong. You are being logged out. Please try again in a minute");
             System.exit(0);
         }
 
@@ -346,7 +346,7 @@ public class Repository {
         List<Order> clientOrder = new ArrayList<>();
         List<Shoes> shoesInOrder = new ArrayList<>();
         ResultSet rs;
-        String getClientOrder = "Select shoes.id, shoes.brand, shoes.model, shoes.color, shoes.size, shoes.price" +
+        String getClientOrder = "Select shoes.id, shoes.brand, shoes.model, shoes.color, shoes.size, shoes.price," +
                 " shoes.in_stock, order_.date from shoes" +
                 " inner join order_details on Shoes.ID = order_details.shoesid inner join order_" +
                 " on order_.ID = order_details.OrderID where order_.id = ? and order_.ClientID = ?";
@@ -364,12 +364,12 @@ public class Repository {
             while (rs.next()) {
                 int shoesID = rs.getInt("ID");
                 String brand = rs.getString("Brand");
-                int size = rs.getInt("Size");
-                String color = rs.getString("Color");
                 String model = rs.getString("Model");
+                String color = rs.getString("Color");
+                int size = rs.getInt("Size");
                 double price = rs.getDouble("Price");
-                Date orderDate = rs.getDate("Date");
                 int inStock = rs.getInt("In_stock");
+                Date orderDate = rs.getDate("Date");
                 shoesInOrder.add(new Shoes(shoesID, brand, size, color, model, price, inStock));
                 clientOrder.add(new Order(inputOrderID, shoesInOrder, orderDate));
 
@@ -439,14 +439,5 @@ public class Repository {
         }
         return reviewList;
     }
-
-
-    public void fillCategory(){
-        List<Category> categoryList = showCategories();
-        categoryList.forEach(c -> c.setShoesListBelongingCat(getShoesByCategoryID(c.getId())));
-    }
-
-
-
 
 }
