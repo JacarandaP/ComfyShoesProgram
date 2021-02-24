@@ -16,7 +16,7 @@ import java.util.Properties;
 
 public class Repository {
     private Properties p = new Properties();
-    //private Connection con;
+
 
     public Repository() {
         try {
@@ -75,12 +75,15 @@ public class Repository {
                 System.out.println("Client not found. Wrong username or password");
                 return 0;
             } else if (count > 1) {
-                System.out.println("something went wrong");
-                System.exit(0);
+                System.out.println("Something went wrong");
+                return 0;
             }
 
         } catch (SQLException throwables) {
+            System.out.println("Something went wrong. You are being logged out. Please try again in a minute");
             throwables.printStackTrace();
+
+
         }
         return clientID;
     }
@@ -101,17 +104,19 @@ public class Repository {
                 categories.add(new Category(categoryID, name, null));
             }
         } catch (SQLException throwables) {
+            System.out.println("Something went wrong. You are being logged out. Please try again in a minute");
             throwables.printStackTrace();
+
         }
         return categories;
     }
 
     public int getCategoryID(String chosenCat) {
 
-        int count = -1;
-        int catID = -1;
+        int count = 0;
+        int catID = 0;
         ResultSet rs;
-        List<Shoes> shoesByCat = new ArrayList<>();
+
 
         String getCatID = "SELECT ID FROM Category WHERE description = ?";
 
@@ -140,14 +145,16 @@ public class Repository {
             }
             if (count == 0) {
                 System.out.println("Category not found");
-                return 0; //TODO check in program
+                return 0;
             } else if (count > 1) {
-                System.out.println("something went wrong");
-                System.exit(0);
+                System.out.println("Something went wrong");
+                return 0;
             }
 
         } catch (SQLException throwables) {
+            System.out.println("Something went wrong. You are being logged out. Please try again in a minute");
             throwables.printStackTrace();
+
         }
         return catID;
     }
@@ -183,13 +190,13 @@ public class Repository {
             }
 
             if (shoesByCat.size() == 0) {
-                System.out.println("Sorry, we don't have shoes of this category right now"); //TODO: maybe this goes infront?
+                System.out.println("Sorry, we don't have shoes of this category right now");
             }
 
 
         } catch (SQLException e) {
+            System.out.println("Something went wrong. You are being logged out. Please try again in a minute");
             e.printStackTrace();
-            System.out.println("something went wrong");
             System.exit(0);
         }
         return shoesByCat;
@@ -230,19 +237,22 @@ public class Repository {
 
             if (shoesbyBrandM.size() == 0) {
                 System.out.println("Sorry, we don't have shoes with that description right now");
+
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("something went wrong");
+            System.out.println("Something went wrong. You are being logged out. Please try again in a minute");
             System.exit(0);
         }
         return shoesbyBrandM;
     }
 
-    public Shoes getShoesIDbyBMCS(int catID, String inputBrand, String inputModel, String inputColor, int inputSize) {
+    public int getShoesIDbyBMCS(int catID, String inputBrand, String inputModel, String inputColor, int inputSize) {
         ResultSet rs;
-        Shoes selectedShoes = null;
+        int selectedShoesID = 0;
+        Shoes selectedShoes = new Shoes();
+
         String getShoesIDbyBMCS = "Select * from shoes inner join shoes_categorydetails" +
                 " on shoes_categorydetails.shoesID = shoes.ID" +
                 " where shoes.brand = ? and shoes.model = ? and shoes.color = ?" +
@@ -271,24 +281,26 @@ public class Repository {
                 double price = rs.getDouble("Price");
                 int inStock = rs.getInt("In_Stock");
                 selectedShoes = new Shoes(shoesID, brand, size, color, model, price, inStock);
+                selectedShoesID = selectedShoes.getShoesID();
 
             }
 
             if (selectedShoes == null) {
                 System.out.println("Sorry, we don't have shoes with that description right now");
+                return 0;
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("something went wrong");
+            System.out.println("Something went wrong. You are being logged out. Please try again in a minute");
             System.exit(0);
         }
-        return selectedShoes;
+        return selectedShoesID;
     }
 
 
     public int addToCart(Integer order, int clientID, int shoesID) {
-        int nyOrderID = -1;
+        int nyOrderID = 0;
         String sp = "Call AddToCart(?, ? , ?, ?)";
 
         try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
@@ -311,12 +323,13 @@ public class Repository {
                 cstmt.setInt(2, clientID);
                 cstmt.setInt(3, shoesID);
                 cstmt.execute();
+                cstmt.registerOutParameter(4, );
 
             }
 
         } catch (SQLException e) {
             System.out.println(e.getMessage() + "(" + e.getErrorCode() + ")");
-            //TODO CONTINUE SHOPPING. STOP LOOP
+            return 0;
 
 
         } catch (Exception e) {
@@ -325,7 +338,7 @@ public class Repository {
             System.exit(0);
         }
 
-        System.out.println("product added to your order");
+        System.out.println("Product added to your order");
         return nyOrderID;
     }
 
