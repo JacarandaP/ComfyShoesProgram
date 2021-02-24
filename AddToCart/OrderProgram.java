@@ -1,9 +1,9 @@
 package AddToCart;
 
 
-import Objects.Category;
-import Objects.Order;
-import Objects.Shoes;
+import Models.Category;
+import Models.Order;
+import Models.Shoes;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -15,63 +15,25 @@ public class OrderProgram {
 
     Repository r = new Repository();
 
+    int clientID;
+    int categoryID;
+    int shoesID;
+    int nyOrder;
+    int order;
     public OrderProgram() throws InterruptedException {
 
-        Repository r = new Repository();
-        int clientID;
-        int categoryID;
-
-        int shoesID;
-        int nyOrder;
-
-
-
         while (true) {
+            initialMenu();
+        }
 
-            clientID = getClient();
+    }
 
-                if (clientID == 0) {
-                    getClient();
-                }
+    public void initialMenu(){
+        clientID = getClient();
 
-            categoryID = getCategory();
-
-                if(categoryID == 0) {
-                    getCategory();
-                }
-
-            List<Shoes> firstSelectionShoesList = getShoesListByCategory(categoryID);
-
-                if(firstSelectionShoesList.size() == 0){
-                    getShoesListByCategory(categoryID);
-                }
-
-            List<Shoes> secondSelectionShoesList = getShoesListByBMC(firstSelectionShoesList, categoryID);
-            if(secondSelectionShoesList.size() == 0){
-                getShoesListByBMC(firstSelectionShoesList, categoryID);
-            }
-
-            shoesID = getShoesFinalSelection(secondSelectionShoesList, categoryID);
-                if (shoesID == 0){
-                    getShoesFinalSelection(secondSelectionShoesList, categoryID);
-                }
-
-                nyOrder = r.addToCart(null, clientID, shoesID);
-               if (nyOrder == 0){
-                   getCategory();
-               }
-
-               showOptionsAfterShop(clientID, shoesID, nyOrder);
-
-
-/*
-
-
-
-
-            }
-*/}
-
+            if (clientID == 0) {
+                initialMenu();
+            } else menu();
         }
 
     public int getClient() {
@@ -127,7 +89,6 @@ public class OrderProgram {
         inputColor = sc.nextLine().trim();
         shoesList = r.getShoesColor(categoryID, inputBrand, inputModel, inputColor);
 
-
         return shoesList;
 
     }
@@ -151,18 +112,16 @@ public class OrderProgram {
 
     }
 
-    public void showFirstMenu(){
-
-    }
 
     public void showOptionsAfterShop(int clientID, int shoesID, int orderID){
         int temp = -1;
         while (temp != 0) {
             System.out.println("Would you like to do now?");
             System.out.println("1: Review this product");
-            System.out.println("2: Keep shopping");
-            System.out.println("3: See your order");
-            System.out.println("4: Log out");
+            System.out.println("2: Read review for this product");
+            System.out.println("3: Keep shopping");
+            System.out.println("4: See your order");
+            System.out.println("5: Log out");
             temp = getInfoFromUser();
             switch (temp){
                 case 1:
@@ -175,13 +134,18 @@ public class OrderProgram {
                     break;
 
                 case 2:
-                    return;
+                     r.getReview(shoesID);
+                    break;
 
                 case 3:
+                    menu();
+                    break;
+
+                case 4:
                     List<Order> finalOrder = r.getOrder(clientID, orderID);
                     finalOrder.forEach(o -> o.printOrder());
                     break;
-                case 4:
+                case 5:
                     System.out.println("Thank you! You are being logged out");
                     System.exit(0);
                     break;
@@ -205,6 +169,39 @@ public class OrderProgram {
         return input;
     }
 
+
+    public void menu() {
+        categoryID = getCategory();
+
+            if (categoryID == 0) {
+            menu();
+            }
+
+        List<Shoes> firstSelectionShoesList = getShoesListByCategory(categoryID);
+
+            if (firstSelectionShoesList.size() == 0) {
+            menu();
+            }
+
+        List<Shoes> secondSelectionShoesList = getShoesListByBMC(firstSelectionShoesList, categoryID);
+
+            if (secondSelectionShoesList.size() == 0) {
+            menu();
+            }
+
+        shoesID = getShoesFinalSelection(secondSelectionShoesList, categoryID);
+            if (shoesID == 0) {
+            menu();
+            }
+
+            if (order == 0) {
+            order = r.addToCart(null, clientID, shoesID);
+            showOptionsAfterShop(clientID, shoesID, order);
+            } else {
+            nyOrder = r.addToCart(order, clientID, shoesID);
+            showOptionsAfterShop(clientID, shoesID, nyOrder);
+        }
+    }
 
     public static void main(String[] args) throws InterruptedException {
         OrderProgram oP = new OrderProgram();

@@ -1,7 +1,5 @@
-package Objects;
+package Models;
 
-
-import java.util.List;
 
 public class Shoes {
     private int shoesID;

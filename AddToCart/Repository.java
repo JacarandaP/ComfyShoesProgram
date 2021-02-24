@@ -1,10 +1,9 @@
 package AddToCart;
 
 
-import Objects.Category;
-import Objects.Order;
-import Objects.Review;
-import Objects.Shoes;
+import Models.Category;
+import Models.Order;
+import Models.Shoes;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -83,7 +82,6 @@ public class Repository {
             System.out.println("Something went wrong. You are being logged out. Please try again in a minute");
             throwables.printStackTrace();
 
-
         }
         return clientID;
     }
@@ -117,7 +115,6 @@ public class Repository {
         int catID = 0;
         ResultSet rs;
 
-
         String getCatID = "SELECT ID FROM Category WHERE description = ?";
 
         try (Connection con = DriverManager.getConnection(p.getProperty("connectionString"),
@@ -131,7 +128,6 @@ public class Repository {
 
             while (rs.next()) {
                 count = rs.getInt("count");
-
 
                 if (count == 1) {
                     getCatIDstm.setString(1, chosenCat);
@@ -160,7 +156,6 @@ public class Repository {
         return catID;
     }
 
-
     public List<Shoes> getShoesByCategoryID(int catID) {
 
         ResultSet rs;
@@ -186,7 +181,6 @@ public class Repository {
                 double price = rs.getDouble("Price");
                 int inStock = rs.getInt("In_Stock");
                 shoesByCat.add(new Shoes(shoesID, brand, size, color, model, price, inStock));
-
 
             }
 
@@ -298,7 +292,6 @@ public class Repository {
         return selectedShoesID;
     }
 
-
     public int addToCart(Integer order, int clientID, int shoesID) {
         int nyOrderID = 0;
         String sp = "Call AddToCart(?, ? , ?, ?)";
@@ -323,6 +316,7 @@ public class Repository {
                 cstmt.setInt(2, clientID);
                 cstmt.setInt(3, shoesID);
                 cstmt.execute();
+                System.out.println("Product added to your order");
                 return order;
 
             }
@@ -400,7 +394,7 @@ public class Repository {
         } catch (SQLException e) {
             return e.getMessage() + "(" + e.getErrorCode() + ")";
 
-    }
+        }
         return "your review has been added";
     }
 
@@ -423,8 +417,12 @@ public class Repository {
             getAveragestm.setInt(2, shoesID);
             getAveragestm.execute();
             avgRate = getAveragestm.getDouble(1);
-            System.out.println("Average rating for this product is " + avgRate);
-
+            if( avgRate == 0.0){
+                System.out.println("No reviews yet");
+            }
+            else {
+                System.out.println("Average rating for this product is " + avgRate);
+            }
             getReviewstm.setInt(1, shoesID);
             rs = getReviewstm.executeQuery();
 
@@ -437,6 +435,7 @@ public class Repository {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+
         return reviewList;
     }
 
