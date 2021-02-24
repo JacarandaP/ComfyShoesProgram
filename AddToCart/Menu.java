@@ -37,14 +37,14 @@ public class Menu {
         while (temp != 0) {
             System.out.println("Would you like to do now?");
             System.out.println("1: Review this product");
-            System.out.println("2: Read review for this product");
+            System.out.println("2: Read reviews for this product");
             System.out.println("3: Keep shopping");
             System.out.println("4: See your order");
             System.out.println("5: Log out");
             temp = getInfoFromUser();
             switch (temp){
                 case 1:
-                    System.out.println("Rate this product from 1 to 4 \n1: Bad \n2: Okej \n3:Good \n 4:Very Good");
+                    System.out.println("Rate this product from 1 to 4 \n1: Bad \n2: Okej \n3:Good \n4:Very Good");
                     Scanner sc = new Scanner(System.in);
                     int inputRate = getInfoFromUser();
                     System.out.println("Write your review (max 350 letters)");
