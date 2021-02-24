@@ -323,7 +323,7 @@ public class Repository {
 
         } catch (SQLException e) {
             System.out.println(e.getMessage() + "(" + e.getErrorCode() + ")");
-            return 0;
+            return order;
 
 
         } catch (Exception e) {

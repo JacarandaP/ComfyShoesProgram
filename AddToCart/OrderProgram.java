@@ -19,7 +19,6 @@ public class OrderProgram {
         while (true) {
             m.initialMenu();
         }
-
     }
 
     public static void main(String[] args) throws InterruptedException {
